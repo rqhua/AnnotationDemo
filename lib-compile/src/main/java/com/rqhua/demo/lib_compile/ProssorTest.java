@@ -87,7 +87,7 @@ public class ProssorTest extends AbstractProcessor {
             String content = JavaFileCreateDemo.builderContentFromJavaPoet(enclosingElementName, clsName, fieldName, value, packageName);
             mMessages.printMessage(Diagnostic.Kind.NOTE, "+++++++++++++++++++\n" + content + "\n+++++++++++++++++++");
             JavaFileCreateDemo.create(mFiler, packageName.toString(), clsName, content);
-            mMessages.printMessage(Diagnostic.Kind.NOTE, "创建完成 \n+++++++++++++++++++");
+            mMessages.printMessage(Diagnostic.Kind.NOTE, "Created!!! \n+++++++++++++++++++");
 
             /*try {
                 JavaFileObject javaFileObject = mFiler.createSourceFile(packageName + "." + clsName);
