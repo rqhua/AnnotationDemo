@@ -1,0 +1,61 @@
+        //element 代表程序的元素，例如包 类 方法
+        mElementUtils = processingEnvironment.getElementUtils();
+        //处理TypeMirror的工具类，用于取类信息
+        mTypeUtils = processingEnvironment.getTypeUtils();
+        //Filer 可以创建文件
+        mFiler = processingEnvironment.getFiler();
+        //错误处理工具
+        mMessages = processingEnvironment.getMessager();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        @Override
+            public boolean process(Set<? extends TypeElement> set, RoundEnvironment roundEnvironment) {
+                for (Element element : roundEnvironment.getElementsAnnotatedWith(FieldAnnotation.class)) {
+                    // 如果注解不是应用在成员上，就过滤
+                    if (element.getKind() != ElementKind.FIELD) {
+                        continue;
+                    }
+                    // 获取注解所在类的 Element
+                    Element enclosingElement = element.getEnclosingElement();
+                    // 获取注解所在类的 Name
+                    Name enclosingElementName = enclosingElement.getSimpleName();
+                    // 生成类的名字
+                    String clsName = enclosingElementName.toString() + "_BindString";
+
+                    // 获取成员变量的名字
+                    String fieldName = element.getSimpleName().toString();
+                    int value = element.getAnnotation(FieldAnnotation.class).value();
+
+                    // 获取包的 Element
+                    PackageElement packageName = mElementUtils.getPackageOf(element);
+
+                    // 创建要生成的代码的字符串
+                    String content = getContentFromJava(value);
+
+                    try {
+                        // 创建文件
+                        JavaFileObject javaFileObject = mFiler.createSourceFile(packageName + "." + clsName);
+                        Writer writer = javaFileObject.openWriter();
+                        // 把内容写入到文件中
+                        writer.write(content);
+                        writer.flush();
+                        writer.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                return false;
+            }
