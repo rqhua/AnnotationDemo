@@ -84,12 +84,12 @@ public class ProssorTest extends AbstractProcessor {
 
             PackageElement packageName = mElementUtils.getPackageOf(element);
 
-            String content = getContentFromJavaPoet(enclosingElementName, clsName, fieldName, value, packageName);
-//
-//            String content = getContentFromJava(clsName, value);
-//            String content = buildJavaFileTest(packageName);
+            String content = JavaFileCreateDemo.builderContentFromJavaPoet(enclosingElementName, clsName, fieldName, value, packageName);
+            mMessages.printMessage(Diagnostic.Kind.NOTE, "+++++++++++++++++++\n" + content + "\n+++++++++++++++++++");
+            JavaFileCreateDemo.create(mFiler, packageName.toString(), clsName, content);
+            mMessages.printMessage(Diagnostic.Kind.NOTE, "创建完成 \n+++++++++++++++++++");
 
-            try {
+            /*try {
                 JavaFileObject javaFileObject = mFiler.createSourceFile(packageName + "." + clsName);
                 Writer writer = javaFileObject.openWriter();
                 writer.write(content);
@@ -97,7 +97,7 @@ public class ProssorTest extends AbstractProcessor {
                 writer.close();
             } catch (IOException e) {
                 e.printStackTrace();
-            }
+            }*/
         }
         return false;
     }
@@ -113,26 +113,5 @@ public class ProssorTest extends AbstractProcessor {
         sb.append("}\n");
         sb.append("}");
         return sb.toString();
-    }
-
-    private String getContentFromJavaPoet(Name enclosingElementName, String clsName, String fieldName, int value, PackageElement packageName) {
-        ClassName resource = ClassName.get("android.content.res", "Resources");
-        ClassName mainActivity = ClassName.get(packageName.toString(), enclosingElementName.toString());
-        mMessages.printMessage(Diagnostic.Kind.NOTE,"++++++++++++++++++++++++++++++");
-        mMessages.printMessage(Diagnostic.Kind.NOTE,packageName.toString());
-        MethodSpec constructor = MethodSpec.constructorBuilder()
-                .addModifiers(Modifier.PUBLIC)
-                .addParameter(mainActivity, "target")
-                .addStatement("$T res = target.getResources()", resource)
-                .addStatement("target.$L = res.getString($L)", fieldName, value)
-                .build();
-
-        TypeSpec typeSpec = TypeSpec.classBuilder(clsName)
-                .addModifiers(Modifier.PUBLIC)
-                .addMethod(constructor)
-                .build();
-
-        mMessages.printMessage(Diagnostic.Kind.NOTE,typeSpec.toString());
-        return JavaFile.builder(packageName.toString(), typeSpec).build().toString();
     }
 }
